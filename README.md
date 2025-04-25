@@ -13,11 +13,9 @@ Insights gained here can inform clinical screening and intervention strategies t
 
 ## Usage
 
-1. Open `sarcopenia_dashboard.Rmd` in RStudio.
-
-2. Knit to HTML (`knitr::knit("Sarcopenia Widgets.Rmd")` or click “Knit”).
-
-3. View the generated `sarcopenia_dashboard.html` in your browser.
+Since our dataset is confidential, the dataset is not available on GitHub.
+You may access our dashboard through the HTML file directly.
+The source code is available on this page.
 
 ## Real-world Impact
 

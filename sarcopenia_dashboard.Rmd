@@ -1,8 +1,9 @@
 ---
 title: "Sarcopenia Widgets"
-output: 
-  html_document:
-    self_contained: true
+output:
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
 ---
 
 ```{r global, include=FALSE}
@@ -44,12 +45,13 @@ groups <- unique(df$oninstiv)
 
 ```
 
-# Dashboard {.tabset}
+Column {data-width=650}
+---------------------------------------------------------------------
+
+### Sarcopenia and Gait Speed {data-height=5000}
 
 Access our GitHub page here!
 https://github.com/MoXHaven/sarcopenia_dashboard
-
-## Sarcopenia and Gait Speed {data-height=1000}
 
 ```{r, echo=FALSE}
 p <- plot_ly()
@@ -117,11 +119,9 @@ p
 
 ```
 
-**Key Takeaways**
 
-This plot displays the trend in grip strength or gait speed over time among participants grouped by their INSTI usage status. From this plot, we can observe that in more than half of all the visits (years), participants who are not using INSTI have a higher grip strength and gait speed than who are using INSTI. This indicates that INSTI is associated with sarcopenia.
 
-## Frailty {data-height=800}
+### Frailty {data-height=5000}
 
 ```{r, echo=FALSE}
 DT::datatable(
@@ -144,11 +144,20 @@ DT::datatable(
 
 ```
 
-**Key Takeaways**
+
+
+Column {data-width=350}
+---------------------------------------------------------------------
+
+### Key Takeaways 1 - Sarcopenia and Gait Speed {data-height=400}
+
+This plot displays the trend in grip strength or gait speed over time among participants grouped by their INSTI usage status. From this plot, we can observe that in more than half of all the visits (years), participants who are not using INSTI have a higher grip strength and gait speed than who are using INSTI. This indicates that INSTI is associated with sarcopenia.
+
+### Key Takeaways 2 - Frailty {data-height=400}
 
 This table allows user to sort and search records related to frailty for further analysis. From this table we can see that most records under 30 years old don't have frailty.
 
-## Data Source {data-height=400}
+### Data Source {data-height=600}
 
 * This dataset is a confidential, simulated cohort with no public link. 
 * It contains 44 records of adult participants aged 20–80 years with and without INSTI use. 
@@ -156,6 +165,6 @@ This table allows user to sort and search records related to frailty for further
 * The study population represents adults switching to INSTIs or on non-INSTI ART. 
 * Records cover visits collected between 2000 and 2010.
 
-## Real-world Impact {data-height=400}
+### Real-world Impact {data-height=400}
 
 This dashboard provides clinicians and researchers with actionable insights into sarcopenia and frailty trends among PLWH on INSTI therapy, enabling early identification of those at greatest risk. By visualizing longitudinal changes and subgroup differences, it supports targeted interventions and informs strategies to improve patient outcomes.
