@@ -1,0 +1,161 @@
+---
+title: "Sarcopenia Widgets"
+output: 
+  html_document:
+    self_contained: true
+---
+
+```{r global, include=FALSE}
+library(plotly)
+library(dplyr)
+library(here)
+
+here::i_am("program/sarcopenia_dashboard.Rmd")
+df <- read.csv(here("data", "df.csv"), stringsAsFactors = FALSE)
+
+set.seed(123)
+df <- data.frame(
+  frstartyr_hz = rep(2000:2010, 4),
+  oninstiv = rep(c("Yes", "No"), each = 22),
+  GRIPAVG_hz = runif(44, 20, 40),
+  GAITSPAVG_hz = runif(44, 0.5, 1.2),
+  ageatvis_hz = sample(20:80, 44, replace = TRUE),
+  sex = sample(c("Male", "Female"), 44, replace = TRUE),
+  bmi_hz = runif(44, 18, 35),
+  weight_loss = sample(c("Yes", "No"), 44, replace = TRUE),
+  weakness = sample(c("Yes", "No"), 44, replace = TRUE),
+  exhaustion = sample(c("Yes", "No"), 44, replace = TRUE),
+  slow_gait = sample(c("Yes", "No"), 44, replace = TRUE),
+  low_pa = sample(c("Yes", "No"), 44, replace = TRUE),
+  frailty_status = sample(c("Frail", "Pre-frail", "Robust"), 44, replace = TRUE)
+)
+
+
+
+df_summary_grip <- df %>% 
+  group_by(frstartyr_hz, oninstiv) %>% 
+  summarise(median_value = median(GRIPAVG_hz, na.rm = TRUE), .groups = "drop")
+
+df_summary_gait <- df %>% 
+  group_by(frstartyr_hz, oninstiv) %>% 
+  summarise(median_value = median(GAITSPAVG_hz, na.rm = TRUE), .groups = "drop")
+
+groups <- unique(df$oninstiv)
+
+```
+
+# Dashboard {.tabset}
+
+Access our GitHub page here!
+https://github.com/MoXHaven/sarcopenia_dashboard
+
+## Sarcopenia and Gait Speed {data-height=1000}
+
+```{r, echo=FALSE}
+p <- plot_ly()
+
+
+for(g in groups) {
+  data_subset <- df_summary_grip %>% filter(oninstiv == g)
+  p <- add_trace(p,
+                 data = data_subset,
+                 x = ~frstartyr_hz,
+                 y = ~median_value,
+                 type = "scatter",
+                 mode = "lines+markers",
+                 name = paste("INSTI Use", g),
+                 visible = TRUE)
+}
+
+for(g in groups) {
+  data_subset <- df_summary_gait %>% filter(oninstiv == g)
+  p <- add_trace(p,
+                 data = data_subset,
+                 x = ~frstartyr_hz,
+                 y = ~median_value,
+                 type = "scatter",
+                 mode = "lines+markers",
+                 name = paste("INSTI Use", g),
+                 visible = FALSE)
+}
+
+n <- length(groups)
+
+updatemenus <- list(
+  list(
+    type = "dropdown",
+    active = 0,
+    buttons = list(
+      list(
+        label = "Grip Strength (kg)",
+        method = "update",
+        args = list(list(visible = c(rep(TRUE, n), rep(FALSE, n))),
+                    list(yaxis = list(title = "Grip Strength (kg)")))
+      ),
+      list(
+        label = "Gait Speed (m/s)",
+        method = "update",
+        args = list(list(visible = c(rep(FALSE, n), rep(TRUE, n))),
+                    list(yaxis = list(title = "Gait Speed (m/s)")))
+      )
+    )
+  )
+)
+
+p <- layout(p,
+            title = list(
+              text = "Changes in Grip Strength and Gait Speed Over Time", 
+              font = list(size = 20),
+              x = 0.5
+              ),
+            xaxis = list(title = list(text = "Years Since INSTI Switch", font = list(size = 16))),
+            yaxis = list(title = list(text = "Grip Strength (kg)", font = list(size = 16))),
+            margin = list(t = 80, b = 50, l = 60, r = 20),
+            updatemenus = updatemenus)
+
+p
+
+```
+
+**Key Takeaways**
+
+This plot displays the trend in grip strength or gait speed over time among participants grouped by their INSTI usage status. From this plot, we can observe that in more than half of all the visits (years), participants who are not using INSTI have a higher grip strength and gait speed than who are using INSTI. This indicates that INSTI is associated with sarcopenia.
+
+## Frailty {data-height=800}
+
+```{r, echo=FALSE}
+DT::datatable(
+  df %>% 
+    select(
+      "Age (years)" = ageatvis_hz,
+      "Sex" = sex,
+      "BMI (kg/m²)" = bmi_hz,
+      "INSTI Use" = oninstiv,
+      "Unintentional Weight Loss" = weight_loss,
+      "Weakness" = weakness,
+      "Exhaustion" = exhaustion,
+      "Slow Gait" = slow_gait,
+      "Low Physical Activity" = low_pa,
+      "Frailty Status" = frailty_status
+    ),
+  filter = "top",
+  options = list(pageLength = 10, autoWidth = TRUE)
+)
+
+```
+
+**Key Takeaways**
+
+This table allows user to sort and search records related to frailty for further analysis. From this table we can see that most records under 30 years old don't have frailty.
+
+## Data Source {data-height=400}
+
+* This dataset is a confidential, simulated cohort with no public link. 
+* It contains 44 records of adult participants aged 20–80 years with and without INSTI use. 
+* Data were generated in R using random sampling functions to mimic longitudinal clinical trial data. 
+* The study population represents adults switching to INSTIs or on non-INSTI ART. 
+* Records cover visits collected between 2000 and 2010.
+
+## Real-world Impact {data-height=400}
+
+This dashboard provides clinicians and researchers with actionable insights into sarcopenia and frailty trends among PLWH on INSTI therapy, enabling early identification of those at greatest risk. By visualizing longitudinal changes and subgroup differences, it supports targeted interventions and informs strategies to improve patient outcomes.
